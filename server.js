@@ -24,16 +24,21 @@ app.post('/api/pairing/request', async (req, res) => {
         message: 'Nomor WhatsApp diperlukan' 
       });
     }
+
     const cleanPhone = phone.replace(/\D/g, '');
+    
     if (cleanPhone.length < 10 || cleanPhone.length > 15) {
       return res.status(400).json({ 
         success: false, 
         message: 'Nomor tidak valid (10-15 digit)' 
       });
     }
+
+    // Cek apakah sudah ada request
     let pairing = await Pairing.findOne({ phone: cleanPhone });
     
     if (pairing) {
+      // Kalau masih pending, kasih tau
       if (pairing.status === 'pending' || pairing.status === 'processing') {
         return res.json({
           success: true,
@@ -41,19 +46,27 @@ app.post('/api/pairing/request', async (req, res) => {
           data: {
             phone: pairing.phone,
             status: pairing.status,
+            source: pairing.source,
             requestedAt: pairing.requestedAt,
             expiresAt: pairing.expiresAt
           }
         });
       }
+      
+      // Kalau sudah expired atau sent, hapus dulu
       await Pairing.deleteOne({ phone: cleanPhone });
     }
+
+    // Buat pairing BARU dengan source 'web'
     const newPairing = await Pairing.create({
       phone: cleanPhone,
+      source: 'web',                    // <-- PENTING: source dari web
       status: 'pending',
       requestedAt: new Date(),
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000) // +5 menit
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000)
     });
+
+    console.log(chalk.green(`✅ Web request: ${cleanPhone} (source: web)`));
 
     res.json({
       success: true,
@@ -61,6 +74,7 @@ app.post('/api/pairing/request', async (req, res) => {
       data: {
         phone: newPairing.phone,
         status: newPairing.status,
+        source: newPairing.source,
         requestedAt: newPairing.requestedAt,
         expiresAt: newPairing.expiresAt
       }
@@ -68,6 +82,7 @@ app.post('/api/pairing/request', async (req, res) => {
 
   } catch (error) {
     console.error('Error:', error);
+    
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -81,6 +96,8 @@ app.post('/api/pairing/request', async (req, res) => {
     });
   }
 });
+
+// 2. Cek status pairing
 app.get('/api/pairing/status/:phone', async (req, res) => {
   try {
     const { phone } = req.params;
@@ -97,6 +114,8 @@ app.get('/api/pairing/status/:phone', async (req, res) => {
         }
       });
     }
+
+    // Cek expired
     const now = new Date();
     if (pairing.status === 'pending' && now > pairing.expiresAt) {
       pairing.status = 'expired';
@@ -108,6 +127,7 @@ app.get('/api/pairing/status/:phone', async (req, res) => {
       data: {
         phone: pairing.phone,
         status: pairing.status,
+        source: pairing.source,           // <-- Tampilkan source
         code: pairing.code,
         requestedAt: pairing.requestedAt,
         expiresAt: pairing.expiresAt
@@ -122,6 +142,8 @@ app.get('/api/pairing/status/:phone', async (req, res) => {
     });
   }
 });
+
+// 3. Health check
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
@@ -132,6 +154,7 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date()
   });
 });
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🌐 Website running at http://localhost:${PORT}`);
