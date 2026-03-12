@@ -95,6 +95,7 @@
             padding: 20px;
             border-radius: 10px;
             display: none;
+            transition: all 0.3s ease;
         }
 
         .status-card.pending {
@@ -128,10 +129,10 @@
         }
 
         .status-card.connected {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-            animation: pulse 1.5s infinite;
+            background: #cce5ff;
+            border: 1px solid #b8daff;
+            color: #004085;
+            animation: pulse 2s infinite;
         }
 
         .code-box {
@@ -165,14 +166,10 @@
             margin-right: 10px;
         }
 
-        .pulse {
-            animation: pulse 1.5s infinite;
-        }
-
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
+            0% { opacity: 1; background: #cce5ff; }
+            50% { opacity: 0.8; background: #b8daff; }
+            100% { opacity: 1; background: #cce5ff; }
         }
 
         @keyframes spin {
@@ -189,24 +186,91 @@
 
         .whatsapp-link {
             display: inline-block;
-            margin-top: 10px;
-            padding: 10px 20px;
+            margin-top: 15px;
+            padding: 12px 25px;
             background: #25D366;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 500;
         }
 
         .status-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 48px;
+            margin-bottom: 15px;
         }
 
-        .retry-count {
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step .circle {
+            width: 40px;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .circle {
+            background: #667eea;
+            transform: scale(1.1);
+        }
+
+        .step.completed .circle {
+            background: #28a745;
+        }
+
+        .step .label {
             font-size: 12px;
+            color: #666;
+        }
+
+        .step.active .label {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            position: relative;
+            margin: -20px 0 30px;
+            border-radius: 2px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .debug-info {
+            font-size: 11px;
             color: #999;
-            margin-top: 5px;
+            margin-top: 15px;
+            padding: 10px;
+            border-top: 1px dashed #ddd;
+            display: none;
         }
     </style>
 </head>
@@ -221,7 +285,7 @@
                 type="text" 
                 id="phone" 
                 placeholder="Contoh: 628123456789"
-                value="6281513607731"
+                value="447920601019"
             >
         </div>
         
@@ -229,21 +293,41 @@
             Request Kode Pairing
         </button>
         
+        <!-- Step Indicator -->
+        <div class="step-indicator" id="stepIndicator" style="display: none;">
+            <div class="step" id="step1">
+                <div class="circle">1</div>
+                <div class="label">Request</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="circle">2</div>
+                <div class="label">Bot Connect</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="circle">3</div>
+                <div class="label">Kode Siap</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
         <div id="statusCard" class="status-card">
             <div id="statusIcon" class="status-icon">🤖</div>
             <div id="statusMessage"></div>
             <div id="codeDisplay" class="code-box" style="display: none;"></div>
             <div id="timerDisplay" class="timer"></div>
-            <div id="whatsappHint" style="display: none; text-align: center; margin-top: 15px;">
+            <div id="whatsappHint" style="display: none; text-align: center;">
                 <a href="#" id="whatsappLink" class="whatsapp-link" target="_blank">
-                    📱 Buka WhatsApp
+                    📱 Buka WhatsApp dan Masukkan Kode
                 </a>
             </div>
-            <div id="retryInfo" class="retry-count" style="display: none;"></div>
+            <div id="lastUpdate" style="font-size: 11px; color: #999; margin-top: 10px;"></div>
         </div>
         
         <p class="info-text">
-            Kode akan muncul di sini setelah diproses bot
+            Status akan update otomatis setiap 3 detik
         </p>
     </div>
 
@@ -252,7 +336,38 @@
         let countdownInterval;
         let currentPhone = '';
         let retryCount = 0;
-        const MAX_RETRY = 30;
+        const MAX_RETRY = 60;
+        let lastStatus = '';
+
+        function updateStep(step) {
+            const stepIndicator = document.getElementById('stepIndicator');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            stepIndicator.style.display = 'flex';
+            progressBar.style.display = 'block';
+            
+            document.getElementById('step1').classList.remove('active', 'completed');
+            document.getElementById('step2').classList.remove('active', 'completed');
+            document.getElementById('step3').classList.remove('active', 'completed');
+            
+            if (step >= 1) {
+                document.getElementById('step1').classList.add('completed');
+                progressFill.style.width = '33%';
+            }
+            if (step >= 2) {
+                document.getElementById('step2').classList.add('completed');
+                progressFill.style.width = '66%';
+            }
+            if (step >= 3) {
+                document.getElementById('step3').classList.add('completed');
+                progressFill.style.width = '100%';
+            }
+            
+            if (step === 1) document.getElementById('step1').classList.add('active');
+            if (step === 2) document.getElementById('step2').classList.add('active');
+            if (step === 3) document.getElementById('step3').classList.add('active');
+        }
 
         async function requestPairing() {
             const phoneInput = document.getElementById('phone');
@@ -268,6 +383,9 @@
 
             currentPhone = phone;
             retryCount = 0;
+            lastStatus = '';
+            
+            localStorage.setItem('lastPhone', phone);
             
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span>Memproses...';
@@ -275,7 +393,6 @@
             statusCard.style.display = 'none';
             codeDisplay.style.display = 'none';
             document.getElementById('whatsappHint').style.display = 'none';
-            document.getElementById('retryInfo').style.display = 'none';
             
             if (checkInterval) clearInterval(checkInterval);
             if (countdownInterval) clearInterval(countdownInterval);
@@ -290,7 +407,8 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showStatus('pending', '✅ Permintaan diterima! Menunggu bot merespon...');
+                    updateStep(1);
+                    showStatus('pending', '✅ Permintaan diterima!\n⏳ Menunggu bot merespon...');
                     
                     checkInterval = setInterval(() => checkStatus(phone), 3000);
                     
@@ -311,7 +429,6 @@
         async function checkStatus(phone) {
             try {
                 retryCount++;
-                document.getElementById('retryInfo').innerHTML = `⏳ Mencoba ke-${retryCount}/${MAX_RETRY}`;
                 
                 const response = await fetch(`/api/pairing/status/${phone}`);
                 const result = await response.json();
@@ -319,16 +436,22 @@
                 if (!result.success) return;
                 
                 const data = result.data;
-                
                 const statusIcon = document.getElementById('statusIcon');
                 
-                // Cek apakah kode sudah ada
+                document.getElementById('lastUpdate').innerHTML = `Update terakhir: ${new Date().toLocaleTimeString()}`;
+                
+                if (lastStatus !== data.status) {
+                    console.log(`Status berubah: ${lastStatus} -> ${data.status}`);
+                    lastStatus = data.status;
+                }
+                
                 if (data.code) {
                     clearInterval(checkInterval);
                     clearInterval(countdownInterval);
                     
                     statusIcon.innerHTML = '✅';
-                    showStatus('success', '✅ Kode pairing berhasil didapatkan!');
+                    updateStep(3);
+                    showStatus('success', '✅ Kode pairing berhasil didapatkan!\n\nMasukkan kode ini di WhatsApp:');
                     
                     const codeDisplay = document.getElementById('codeDisplay');
                     codeDisplay.style.display = 'block';
@@ -339,18 +462,16 @@
                     const waLink = document.getElementById('whatsappLink');
                     waLink.href = `https://wa.me/${phone}?text=Kode%20pairing%20saya%20adalah%20${data.code}`;
                     document.getElementById('whatsappHint').style.display = 'block';
-                    document.getElementById('retryInfo').style.display = 'none';
                     
                     resetButton();
                     return;
                 }
                 
-                // Handle berbagai status
                 switch(data.status) {
                     case 'connected':
                         statusIcon.innerHTML = '🟢';
-                        showStatus('connected', '🟢 Bot sudah terhubung!\n⏳ Menunggu kode pairing...');
-                        document.getElementById('retryInfo').style.display = 'block';
+                        updateStep(2);
+                        showStatus('connected', '🟢 BOT CONNECT!\n\nBot WhatsApp sudah terhubung\n⏳ Sedang meminta kode pairing...');
                         break;
                         
                     case 'pairing_code':
@@ -360,7 +481,8 @@
                             clearInterval(countdownInterval);
                             
                             statusIcon.innerHTML = '✅';
-                            showStatus('success', '✅ Kode pairing berhasil didapatkan!');
+                            updateStep(3);
+                            showStatus('success', '✅ Kode pairing berhasil didapatkan!\n\nMasukkan kode ini di WhatsApp:');
                             
                             const codeDisplay = document.getElementById('codeDisplay');
                             codeDisplay.style.display = 'block';
@@ -371,7 +493,6 @@
                             const waLink = document.getElementById('whatsappLink');
                             waLink.href = `https://wa.me/${phone}?text=Kode%20pairing%20saya%20adalah%20${data.code}`;
                             document.getElementById('whatsappHint').style.display = 'block';
-                            document.getElementById('retryInfo').style.display = 'none';
                             
                             resetButton();
                         }
@@ -379,8 +500,8 @@
                         
                     case 'processing':
                         statusIcon.innerHTML = '⏳';
-                        showStatus('pending', '⏳ Bot sedang memproses...');
-                        document.getElementById('retryInfo').style.display = 'block';
+                        updateStep(1);
+                        showStatus('pending', '⏳ Bot sedang memproses...\n\nMempersiapkan bot clone');
                         break;
                         
                     case 'expired':
@@ -388,36 +509,34 @@
                         clearInterval(countdownInterval);
                         
                         statusIcon.innerHTML = '⏰';
-                        showStatus('expired', '⏰ Waktu habis! Silakan request ulang.');
+                        updateStep(1);
+                        showStatus('expired', '⏰ Waktu habis!\n\nSilakan request ulang.');
                         document.getElementById('codeDisplay').style.display = 'none';
                         document.getElementById('whatsappHint').style.display = 'none';
-                        document.getElementById('retryInfo').style.display = 'none';
                         resetButton();
                         break;
                         
                     case 'pending':
                         statusIcon.innerHTML = '⏳';
-                        showStatus('pending', '⏳ Menunggu diproses...');
-                        document.getElementById('retryInfo').style.display = 'block';
+                        updateStep(1);
+                        showStatus('pending', '⏳ Menunggu diproses...\n\nBot akan segera merespon');
                         break;
                         
                     case 'failed':
                         statusIcon.innerHTML = '❌';
-                        showStatus('error', '❌ Gagal memproses, coba lagi nanti');
-                        document.getElementById('retryInfo').style.display = 'none';
+                        updateStep(1);
+                        showStatus('error', '❌ Gagal memproses\n\nCoba lagi nanti');
                         break;
                         
                     default:
                         statusIcon.innerHTML = '🤖';
                         showStatus('pending', `⏳ Status: ${data.status}`);
-                        document.getElementById('retryInfo').style.display = 'block';
                 }
                 
-                // Auto stop jika terlalu lama
                 if (retryCount >= MAX_RETRY) {
                     clearInterval(checkInterval);
                     clearInterval(countdownInterval);
-                    showStatus('expired', '⏰ Waktu habis! Silakan request ulang.');
+                    showStatus('expired', '⏰ Waktu habis (timeout)\n\nSilakan request ulang.');
                     resetButton();
                 }
                 
@@ -436,7 +555,7 @@
                 
                 if (diff <= 0) {
                     clearInterval(countdownInterval);
-                    timerDisplay.innerHTML = 'Waktu habis';
+                    timerDisplay.innerHTML = '⏰ Waktu habis';
                     return;
                 }
                 
@@ -471,18 +590,6 @@
             const btn = document.getElementById('submitBtn');
             btn.disabled = false;
             btn.innerHTML = 'Request Kode Pairing';
-        }
-
-        function resetForm() {
-            if (checkInterval) clearInterval(checkInterval);
-            if (countdownInterval) clearInterval(countdownInterval);
-            
-            document.getElementById('phone').value = '';
-            document.getElementById('statusCard').style.display = 'none';
-            document.getElementById('codeDisplay').style.display = 'none';
-            document.getElementById('whatsappHint').style.display = 'none';
-            document.getElementById('retryInfo').style.display = 'none';
-            resetButton();
         }
 
         document.getElementById('phone').addEventListener('keypress', function(e) {
