@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const pairingSchema = new mongoose.Schema({
-  phone: { type: String, required: true, unique: true },
+  phone: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
   source: { 
     type: String, 
     enum: ['web', 'bot', 'manual'], 
@@ -9,12 +13,32 @@ const pairingSchema = new mongoose.Schema({
   },
   status: { 
     type: String, 
-    enum: ['pending', 'processing', 'connected', 'pairing_code', 'sent', 'expired', 'failed', 'existing', 'logged_out', 'stopped'], 
+    enum: [
+      'pending',      // 0. Menunggu diproses
+      'processing',    // 1. Sedang diproses bot
+      'pairing_code',  // 2. Kode pairing siap
+      'connected',     // 3. Bot sudah connect (kode dipakai)
+      'sent',          // 4. Kode sudah dikirim (alternatif)
+      'expired',       // 5. Kode expired
+      'failed',        // 6. Gagal
+      'existing',      // 7. Bot sudah ada
+      'logged_out',    // 8. Bot logout
+      'stopped'        // 9. Bot dihentikan
+    ], 
     default: 'pending' 
   },
-  code: { type: String, default: null },
-  requestedAt: { type: Date, default: Date.now },
-  expiresAt: { type: Date, default: () => new Date(+new Date() + 5 * 60 * 1000) }
+  code: { 
+    type: String, 
+    default: null 
+  },
+  requestedAt: { 
+    type: Date, 
+    default: Date.now 
+  },
+  expiresAt: { 
+    type: Date, 
+    default: () => new Date(+new Date() + 5 * 60 * 1000) 
+  }
 });
 
 module.exports = mongoose.model('Pairing', pairingSchema);
