@@ -95,10 +95,10 @@
             padding: 20px;
             border-radius: 10px;
             display: none;
-            transition: all 0.3s ease;
+            text-align: center;
         }
 
-        .status-card.pending {
+        .status-card.waiting {
             background: #fff3cd;
             border: 1px solid #ffeeba;
             color: #856404;
@@ -108,6 +108,13 @@
             background: #d4edda;
             border: 1px solid #c3e6cb;
             color: #155724;
+        }
+
+        .status-card.connected {
+            background: #cce5ff;
+            border: 1px solid #b8daff;
+            color: #004085;
+            animation: pulse 2s infinite;
         }
 
         .status-card.expired {
@@ -122,37 +129,32 @@
             color: #721c24;
         }
 
-        .status-card.info {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-
-        .status-card.connected {
-            background: #cce5ff;
-            border: 1px solid #b8daff;
-            color: #004085;
-            animation: pulse 2s infinite;
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
 
         .code-box {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 32px;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 40px;
             font-weight: bold;
             text-align: center;
-            letter-spacing: 8px;
-            margin: 15px 0;
-            border: 2px dashed #667eea;
+            letter-spacing: 10px;
+            margin: 20px 0;
+            border: 3px dashed #667eea;
             word-break: break-all;
+            font-family: monospace;
         }
 
         .timer {
             text-align: center;
-            font-size: 14px;
+            font-size: 16px;
             color: #666;
-            margin-top: 10px;
+            margin: 15px 0;
+            font-weight: bold;
         }
 
         .loading {
@@ -164,12 +166,6 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 10px;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; background: #cce5ff; }
-            50% { opacity: 0.8; background: #b8daff; }
-            100% { opacity: 1; background: #cce5ff; }
         }
 
         @keyframes spin {
@@ -187,90 +183,24 @@
         .whatsapp-link {
             display: inline-block;
             margin-top: 15px;
-            padding: 12px 25px;
+            padding: 15px 30px;
             background: #25D366;
             color: white;
             text-decoration: none;
             border-radius: 50px;
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: bold;
         }
 
         .status-icon {
-            font-size: 48px;
+            font-size: 60px;
             margin-bottom: 15px;
         }
 
-        .step-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step .circle {
-            width: 40px;
-            height: 40px;
-            background: #e0e0e0;
-            border-radius: 50%;
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .step.active .circle {
-            background: #667eea;
-            transform: scale(1.1);
-        }
-
-        .step.completed .circle {
-            background: #28a745;
-        }
-
-        .step .label {
-            font-size: 12px;
+        .instruction {
+            font-size: 14px;
+            margin-top: 10px;
             color: #666;
-        }
-
-        .step.active .label {
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: #e0e0e0;
-            position: relative;
-            margin: -20px 0 30px;
-            border-radius: 2px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #667eea;
-            border-radius: 2px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        .debug-info {
-            font-size: 11px;
-            color: #999;
-            margin-top: 15px;
-            padding: 10px;
-            border-top: 1px dashed #ddd;
-            display: none;
         }
     </style>
 </head>
@@ -285,7 +215,7 @@
                 type="text" 
                 id="phone" 
                 placeholder="Contoh: 628123456789"
-                value="447920601019"
+                value="6281513607731"
             >
         </div>
         
@@ -293,41 +223,33 @@
             Request Kode Pairing
         </button>
         
-        <!-- Step Indicator -->
-        <div class="step-indicator" id="stepIndicator" style="display: none;">
-            <div class="step" id="step1">
-                <div class="circle">1</div>
-                <div class="label">Request</div>
-            </div>
-            <div class="step" id="step2">
-                <div class="circle">2</div>
-                <div class="label">Bot Connect</div>
-            </div>
-            <div class="step" id="step3">
-                <div class="circle">3</div>
-                <div class="label">Kode Siap</div>
-            </div>
-        </div>
-        
-        <div class="progress-bar" id="progressBar" style="display: none;">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        
         <div id="statusCard" class="status-card">
             <div id="statusIcon" class="status-icon">🤖</div>
+            <div id="statusTitle" style="font-size: 20px; font-weight: bold; margin-bottom: 10px;"></div>
             <div id="statusMessage"></div>
             <div id="codeDisplay" class="code-box" style="display: none;"></div>
             <div id="timerDisplay" class="timer"></div>
-            <div id="whatsappHint" style="display: none; text-align: center;">
+            <div id="whatsappHint" style="display: none;">
                 <a href="#" id="whatsappLink" class="whatsapp-link" target="_blank">
-                    📱 Buka WhatsApp dan Masukkan Kode
+                    📱 BUKA WHATSAPP
                 </a>
+                <div class="instruction">
+                    1. Buka WhatsApp di HP<br>
+                    2. Masukkan kode di atas<br>
+                    3. Tunggu konfirmasi
+                </div>
             </div>
-            <div id="lastUpdate" style="font-size: 11px; color: #999; margin-top: 10px;"></div>
+            <div id="connectedHint" style="display: none;">
+                <div style="font-size: 18px; margin: 15px 0;">✅ BOT CONNECT!</div>
+                <div class="instruction">
+                    WhatsApp Anda sudah terhubung dengan bot<br>
+                    Silahkan mulai menggunakan bot
+                </div>
+            </div>
         </div>
         
         <p class="info-text">
-            Status akan update otomatis setiap 3 detik
+            Kode akan expired dalam 5 menit jika tidak digunakan
         </p>
     </div>
 
@@ -335,67 +257,24 @@
         let checkInterval;
         let countdownInterval;
         let currentPhone = '';
-        let retryCount = 0;
-        const MAX_RETRY = 60;
-        let lastStatus = '';
-
-        function updateStep(step) {
-            const stepIndicator = document.getElementById('stepIndicator');
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-            
-            stepIndicator.style.display = 'flex';
-            progressBar.style.display = 'block';
-            
-            document.getElementById('step1').classList.remove('active', 'completed');
-            document.getElementById('step2').classList.remove('active', 'completed');
-            document.getElementById('step3').classList.remove('active', 'completed');
-            
-            if (step >= 1) {
-                document.getElementById('step1').classList.add('completed');
-                progressFill.style.width = '33%';
-            }
-            if (step >= 2) {
-                document.getElementById('step2').classList.add('completed');
-                progressFill.style.width = '66%';
-            }
-            if (step >= 3) {
-                document.getElementById('step3').classList.add('completed');
-                progressFill.style.width = '100%';
-            }
-            
-            if (step === 1) document.getElementById('step1').classList.add('active');
-            if (step === 2) document.getElementById('step2').classList.add('active');
-            if (step === 3) document.getElementById('step3').classList.add('active');
-        }
 
         async function requestPairing() {
             const phoneInput = document.getElementById('phone');
             const phone = phoneInput.value.replace(/\D/g, '');
             const btn = document.getElementById('submitBtn');
-            const statusCard = document.getElementById('statusCard');
-            const codeDisplay = document.getElementById('codeDisplay');
             
             if (!phone || phone.length < 10) {
-                showStatus('error', 'Masukkan nomor yang valid (minimal 10 digit)');
+                alert('Masukkan nomor yang valid (minimal 10 digit)');
                 return;
             }
 
             currentPhone = phone;
-            retryCount = 0;
-            lastStatus = '';
-            
             localStorage.setItem('lastPhone', phone);
             
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span>Memproses...';
             
-            statusCard.style.display = 'none';
-            codeDisplay.style.display = 'none';
-            document.getElementById('whatsappHint').style.display = 'none';
-            
-            if (checkInterval) clearInterval(checkInterval);
-            if (countdownInterval) clearInterval(countdownInterval);
+            resetDisplay();
 
             try {
                 const response = await fetch('/api/pairing/request', {
@@ -407,137 +286,77 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    updateStep(1);
-                    showStatus('pending', '✅ Permintaan diterima!\n⏳ Menunggu bot merespon...');
+                    showWaiting('Permintaan diterima', 'Menunggu bot menghasilkan kode...');
                     
-                    checkInterval = setInterval(() => checkStatus(phone), 3000);
+                    if (checkInterval) clearInterval(checkInterval);
+                    checkInterval = setInterval(() => checkStatus(phone), 2000);
                     
-                    if (result.data && result.data.expiresAt) {
-                        startCountdown(result.data.expiresAt);
-                    }
                 } else {
-                    showStatus('error', '❌ ' + (result.message || 'Gagal memproses request'));
+                    showError('Gagal: ' + result.message);
                     resetButton();
                 }
                 
             } catch (error) {
-                showStatus('error', '❌ Gagal terhubung ke server');
+                showError('Gagal terhubung ke server');
                 resetButton();
             }
         }
 
         async function checkStatus(phone) {
             try {
-                retryCount++;
-                
                 const response = await fetch(`/api/pairing/status/${phone}`);
                 const result = await response.json();
                 
                 if (!result.success) return;
                 
                 const data = result.data;
-                const statusIcon = document.getElementById('statusIcon');
                 
-                document.getElementById('lastUpdate').innerHTML = `Update terakhir: ${new Date().toLocaleTimeString()}`;
+                const now = new Date();
+                const expiry = new Date(data.expiresAt);
                 
-                if (lastStatus !== data.status) {
-                    console.log(`Status berubah: ${lastStatus} -> ${data.status}`);
-                    lastStatus = data.status;
-                }
-                
-                if (data.code) {
+                if (now > expiry && data.status !== 'connected' && data.status !== 'expired') {
                     clearInterval(checkInterval);
                     clearInterval(countdownInterval);
-                    
-                    statusIcon.innerHTML = '✅';
-                    updateStep(3);
-                    showStatus('success', '✅ Kode pairing berhasil didapatkan!\n\nMasukkan kode ini di WhatsApp:');
-                    
-                    const codeDisplay = document.getElementById('codeDisplay');
-                    codeDisplay.style.display = 'block';
-                    codeDisplay.innerHTML = formatCode(data.code);
-                    
-                    document.getElementById('timerDisplay').innerHTML = '';
-                    
-                    const waLink = document.getElementById('whatsappLink');
-                    waLink.href = `https://wa.me/${phone}?text=Kode%20pairing%20saya%20adalah%20${data.code}`;
-                    document.getElementById('whatsappHint').style.display = 'block';
-                    
+                    showExpired('Kode expired', 'Waktu habis! Silakan request ulang.');
                     resetButton();
                     return;
                 }
                 
                 switch(data.status) {
-                    case 'connected':
-                        statusIcon.innerHTML = '🟢';
-                        updateStep(2);
-                        showStatus('connected', '🟢 BOT CONNECT!\n\nBot WhatsApp sudah terhubung\n⏳ Sedang meminta kode pairing...');
+                    case 'pairing_code':
+                        clearInterval(checkInterval);
+                        showCodeReady('KODE PAIRING SIAP', data.code, expiry);
+                        startCountdown(expiry);
                         break;
                         
-                    case 'pairing_code':
-                    case 'sent':
-                        if (data.code) {
-                            clearInterval(checkInterval);
-                            clearInterval(countdownInterval);
-                            
-                            statusIcon.innerHTML = '✅';
-                            updateStep(3);
-                            showStatus('success', '✅ Kode pairing berhasil didapatkan!\n\nMasukkan kode ini di WhatsApp:');
-                            
-                            const codeDisplay = document.getElementById('codeDisplay');
-                            codeDisplay.style.display = 'block';
-                            codeDisplay.innerHTML = formatCode(data.code);
-                            
-                            document.getElementById('timerDisplay').innerHTML = '';
-                            
-                            const waLink = document.getElementById('whatsappLink');
-                            waLink.href = `https://wa.me/${phone}?text=Kode%20pairing%20saya%20adalah%20${data.code}`;
-                            document.getElementById('whatsappHint').style.display = 'block';
-                            
-                            resetButton();
-                        }
+                    case 'connected':
+                        clearInterval(checkInterval);
+                        clearInterval(countdownInterval);
+                        showConnected('BOT CONNECT', 'WhatsApp Anda sudah terhubung dengan bot');
+                        resetButton();
                         break;
                         
                     case 'processing':
-                        statusIcon.innerHTML = '⏳';
-                        updateStep(1);
-                        showStatus('pending', '⏳ Bot sedang memproses...\n\nMempersiapkan bot clone');
+                        showWaiting('Memproses', 'Bot sedang menyiapkan kode');
+                        break;
+                        
+                    case 'pending':
+                        showWaiting('Menunggu', 'Bot akan segera merespon');
                         break;
                         
                     case 'expired':
                         clearInterval(checkInterval);
                         clearInterval(countdownInterval);
-                        
-                        statusIcon.innerHTML = '⏰';
-                        updateStep(1);
-                        showStatus('expired', '⏰ Waktu habis!\n\nSilakan request ulang.');
-                        document.getElementById('codeDisplay').style.display = 'none';
-                        document.getElementById('whatsappHint').style.display = 'none';
+                        showExpired('Kode expired', 'Waktu habis! Silakan request ulang.');
                         resetButton();
                         break;
                         
-                    case 'pending':
-                        statusIcon.innerHTML = '⏳';
-                        updateStep(1);
-                        showStatus('pending', '⏳ Menunggu diproses...\n\nBot akan segera merespon');
-                        break;
-                        
                     case 'failed':
-                        statusIcon.innerHTML = '❌';
-                        updateStep(1);
-                        showStatus('error', '❌ Gagal memproses\n\nCoba lagi nanti');
+                        showError('Gagal memproses');
                         break;
                         
                     default:
-                        statusIcon.innerHTML = '🤖';
-                        showStatus('pending', `⏳ Status: ${data.status}`);
-                }
-                
-                if (retryCount >= MAX_RETRY) {
-                    clearInterval(checkInterval);
-                    clearInterval(countdownInterval);
-                    showStatus('expired', '⏰ Waktu habis (timeout)\n\nSilakan request ulang.');
-                    resetButton();
+                        showWaiting('Memproses', 'Status: ' + data.status);
                 }
                 
             } catch (error) {
@@ -545,8 +364,99 @@
             }
         }
 
+        function showCodeReady(title, code, expiry) {
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            const codeDisplay = document.getElementById('codeDisplay');
+            const whatsappHint = document.getElementById('whatsappHint');
+            const connectedHint = document.getElementById('connectedHint');
+            
+            statusCard.style.display = 'block';
+            statusCard.className = 'status-card success';
+            
+            statusIcon.innerHTML = '🔑';
+            statusTitle.innerHTML = title;
+            statusMessage.innerHTML = 'Masukkan kode ini di WhatsApp:';
+            
+            codeDisplay.style.display = 'block';
+            codeDisplay.innerHTML = formatCode(code);
+            
+            whatsappHint.style.display = 'block';
+            connectedHint.style.display = 'none';
+            
+            const waLink = document.getElementById('whatsappLink');
+            waLink.href = `https://wa.me/${currentPhone}`;
+        }
+
+        function showConnected(title, message) {
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            const codeDisplay = document.getElementById('codeDisplay');
+            const whatsappHint = document.getElementById('whatsappHint');
+            const connectedHint = document.getElementById('connectedHint');
+            
+            statusCard.style.display = 'block';
+            statusCard.className = 'status-card connected';
+            
+            statusIcon.innerHTML = '✅';
+            statusTitle.innerHTML = title;
+            statusMessage.innerHTML = message;
+            
+            codeDisplay.style.display = 'none';
+            whatsappHint.style.display = 'none';
+            connectedHint.style.display = 'block';
+        }
+
+        function showWaiting(title, message) {
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusCard.style.display = 'block';
+            statusCard.className = 'status-card waiting';
+            
+            statusIcon.innerHTML = '⏳';
+            statusTitle.innerHTML = title;
+            statusMessage.innerHTML = message;
+        }
+
+        function showExpired(title, message) {
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusCard.style.display = 'block';
+            statusCard.className = 'status-card expired';
+            
+            statusIcon.innerHTML = '⏰';
+            statusTitle.innerHTML = title;
+            statusMessage.innerHTML = message;
+        }
+
+        function showError(message) {
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusCard.style.display = 'block';
+            statusCard.className = 'status-card error';
+            
+            statusIcon.innerHTML = '❌';
+            statusTitle.innerHTML = 'Error';
+            statusMessage.innerHTML = message;
+        }
+
         function startCountdown(expiresAt) {
             const timerDisplay = document.getElementById('timerDisplay');
+            
+            if (countdownInterval) clearInterval(countdownInterval);
             
             countdownInterval = setInterval(() => {
                 const now = new Date();
@@ -555,7 +465,7 @@
                 
                 if (diff <= 0) {
                     clearInterval(countdownInterval);
-                    timerDisplay.innerHTML = '⏰ Waktu habis';
+                    timerDisplay.innerHTML = '⏰ Kode expired';
                     return;
                 }
                 
@@ -567,23 +477,21 @@
         }
 
         function formatCode(code) {
-            if (!code) return 'Kode tidak tersedia';
-            
-            if (code.includes('-')) {
-                return code;
-            }
-            
+            if (!code) return 'ERROR';
+            if (code.includes('-')) return code;
             const match = code.match(/.{1,4}/g);
             return match ? match.join('-') : code;
         }
 
-        function showStatus(type, message) {
-            const statusCard = document.getElementById('statusCard');
-            const statusMessage = document.getElementById('statusMessage');
+        function resetDisplay() {
+            document.getElementById('statusCard').style.display = 'none';
+            document.getElementById('codeDisplay').style.display = 'none';
+            document.getElementById('whatsappHint').style.display = 'none';
+            document.getElementById('connectedHint').style.display = 'none';
+            document.getElementById('timerDisplay').innerHTML = '';
             
-            statusCard.style.display = 'block';
-            statusCard.className = `status-card ${type}`;
-            statusMessage.innerHTML = message.replace(/\n/g, '<br>');
+            if (countdownInterval) clearInterval(countdownInterval);
+            if (checkInterval) clearInterval(checkInterval);
         }
 
         function resetButton() {
@@ -593,16 +501,12 @@
         }
 
         document.getElementById('phone').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                requestPairing();
-            }
+            if (e.key === 'Enter') requestPairing();
         });
 
         window.addEventListener('load', function() {
             const savedPhone = localStorage.getItem('lastPhone');
-            if (savedPhone) {
-                document.getElementById('phone').value = savedPhone;
-            }
+            if (savedPhone) document.getElementById('phone').value = savedPhone;
         });
     </script>
 </body>
