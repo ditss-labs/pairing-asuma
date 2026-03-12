@@ -215,7 +215,7 @@
                 type="text" 
                 id="phone" 
                 placeholder="Contoh: 628123456789"
-                value="6281513607731"
+                value="447920601019"
             >
         </div>
         
@@ -307,9 +307,12 @@
                 const response = await fetch(`/api/pairing/status/${phone}`);
                 const result = await response.json();
                 
+                console.log('API Response:', result);
+                
                 if (!result.success) return;
                 
                 const data = result.data;
+                console.log('Status dari MongoDB:', data.status);
                 
                 const now = new Date();
                 const expiry = new Date(data.expiresAt);
@@ -323,17 +326,18 @@
                 }
                 
                 switch(data.status) {
-                    case 'pairing_code':
-                        clearInterval(checkInterval);
-                        showCodeReady('KODE PAIRING SIAP', data.code, expiry);
-                        startCountdown(expiry);
-                        break;
-                        
                     case 'connected':
+                        console.log('🔥 DETECTED CONNECTED!');
                         clearInterval(checkInterval);
                         clearInterval(countdownInterval);
                         showConnected('BOT CONNECT', 'WhatsApp Anda sudah terhubung dengan bot');
                         resetButton();
+                        break;
+                        
+                    case 'pairing_code':
+                        clearInterval(checkInterval);
+                        showCodeReady('KODE PAIRING SIAP', data.code, expiry);
+                        startCountdown(expiry);
                         break;
                         
                     case 'processing':
@@ -478,9 +482,7 @@
 
         function formatCode(code) {
             if (!code) return 'ERROR';
-            if (code.includes('-')) return code;
-            const match = code.match(/.{1,4}/g);
-            return match ? match.join('-') : code;
+            return code;
         }
 
         function resetDisplay() {
