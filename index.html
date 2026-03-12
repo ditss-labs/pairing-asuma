@@ -115,6 +115,12 @@
             color: #721c24;
         }
 
+        .status-card.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
         .code-box {
             background: white;
             padding: 20px;
@@ -125,6 +131,7 @@
             letter-spacing: 8px;
             margin: 15px 0;
             border: 2px dashed #667eea;
+            word-break: break-all;
         }
 
         .timer {
@@ -184,7 +191,7 @@
         </div>
         
         <p class="info-text">
-            Kode akan dikirim oleh bot. Tunggu beberapa saat.
+            Kode akan muncul di sini setelah diproses bot
         </p>
     </div>
 
@@ -193,29 +200,27 @@
         let countdownInterval;
 
         async function requestPairing() {
-            const phone = document.getElementById('phone').value.replace(/\D/g, '');
+            const phoneInput = document.getElementById('phone');
+            const phone = phoneInput.value.replace(/\D/g, '');
             const btn = document.getElementById('submitBtn');
             const statusCard = document.getElementById('statusCard');
+            const codeDisplay = document.getElementById('codeDisplay');
             
-            // Validasi
             if (!phone || phone.length < 10) {
                 showStatus('error', 'Masukkan nomor yang valid (minimal 10 digit)');
                 return;
             }
 
-            // Disable button
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span>Memproses...';
             
-            // Reset tampilan
             statusCard.style.display = 'none';
+            codeDisplay.style.display = 'none';
             
-            // Hentikan interval sebelumnya
             if (checkInterval) clearInterval(checkInterval);
             if (countdownInterval) clearInterval(countdownInterval);
 
             try {
-                // Request ke server
                 const response = await fetch('/api/pairing/request', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -227,11 +232,13 @@
                 if (result.success) {
                     showStatus('pending', '✅ Permintaan diterima! Menunggu kode pairing...');
                     
-                    // Mulai cek status
                     checkInterval = setInterval(() => checkStatus(phone), 2000);
-                    startCountdown(result.data.expiresAt);
+                    
+                    if (result.data && result.data.expiresAt) {
+                        startCountdown(result.data.expiresAt);
+                    }
                 } else {
-                    showStatus('error', '❌ ' + result.message);
+                    showStatus('error', '❌ ' + (result.message || 'Gagal memproses request'));
                     resetButton();
                 }
                 
@@ -241,64 +248,56 @@
             }
         }
 
-async function checkStatus(phone) {
-    try {
-        const response = await fetch(`/api/pairing/status/${phone}`);
-        const result = await response.json();
-        
-        if (!result.success) return;
-        
-        const data = result.data;
-        
-        // Tampilkan source (optional)
-        console.log('Source:', data.source); // web atau bot
-        
-        switch(data.status) {
-            case 'sent':
-                clearInterval(checkInterval);
-                showStatus('success', '✅ Kode pairing berhasil didapatkan!');
-                document.getElementById('codeDisplay').style.display = 'block';
-                document.getElementById('codeDisplay').innerHTML = formatCode(data.code);
-                document.getElementById('timerDisplay').innerHTML = '';
-                resetButton();
-                break;
+        async function checkStatus(phone) {
+            try {
+                const response = await fetch(`/api/pairing/status/${phone}`);
+                const result = await response.json();
                 
-            case 'pairing_code': // Tambahkan ini
-                clearInterval(checkInterval);
-                showStatus('success', '✅ Kode pairing siap!');
-                document.getElementById('codeDisplay').style.display = 'block';
-                document.getElementById('codeDisplay').innerHTML = formatCode(data.code);
-                document.getElementById('timerDisplay').innerHTML = '';
-                resetButton();
-                break;
+                if (!result.success) return;
                 
-            case 'connected':
-                showStatus('pending', '✅ Bot sudah terhubung, menunggu kode...');
-                break;
+                const data = result.data;
                 
-            case 'processing':
-                showStatus('pending', '⏳ Bot sedang memproses...');
-                break;
+                if (data.status === 'sent' || data.status === 'pairing_code') {
+                    clearInterval(checkInterval);
+                    clearInterval(countdownInterval);
+                    
+                    showStatus('success', '✅ Kode pairing berhasil didapatkan!');
+                    
+                    const codeDisplay = document.getElementById('codeDisplay');
+                    codeDisplay.style.display = 'block';
+                    codeDisplay.innerHTML = formatCode(data.code);
+                    
+                    document.getElementById('timerDisplay').innerHTML = '';
+                    resetButton();
+                    
+                } else if (data.status === 'connected') {
+                    showStatus('pending', '✅ Bot terhubung, sedang meminta kode...');
+                    
+                } else if (data.status === 'processing') {
+                    showStatus('pending', '⏳ Bot sedang memproses...');
+                    
+                } else if (data.status === 'expired') {
+                    clearInterval(checkInterval);
+                    clearInterval(countdownInterval);
+                    
+                    showStatus('expired', '⏰ Waktu habis! Silakan request ulang.');
+                    document.getElementById('codeDisplay').style.display = 'none';
+                    resetButton();
+                    
+                } else if (data.status === 'pending') {
+                    showStatus('pending', '⏳ Menunggu diproses...');
+                    
+                } else if (data.status === 'failed') {
+                    showStatus('error', '❌ Gagal memproses, coba lagi nanti');
+                    
+                } else {
+                    showStatus('pending', `⏳ Status: ${data.status}`);
+                }
                 
-            case 'expired':
-                clearInterval(checkInterval);
-                showStatus('expired', '⏰ Waktu habis! Silakan request ulang.');
-                document.getElementById('codeDisplay').style.display = 'none';
-                resetButton();
-                break;
-                
-            case 'pending':
-                showStatus('pending', '⏳ Menunggu diproses...');
-                break;
-                
-            default:
-                showStatus('pending', `⏳ Status: ${data.status}`);
+            } catch (error) {
+                console.error('Check status error:', error);
+            }
         }
-        
-    } catch (error) {
-        console.error('Check status error:', error);
-    }
-}
 
         function startCountdown(expiresAt) {
             const timerDisplay = document.getElementById('timerDisplay');
@@ -322,9 +321,14 @@ async function checkStatus(phone) {
         }
 
         function formatCode(code) {
-            if (!code) return '';
-            // Format: XXXX-XXXX-XXXX
-            return code.match(/.{1,4}/g).join('-') || code;
+            if (!code) return 'Kode tidak tersedia';
+            
+            if (code.includes('-')) {
+                return code;
+            }
+            
+            const match = code.match(/.{1,4}/g);
+            return match ? match.join('-') : code;
         }
 
         function showStatus(type, message) {
@@ -341,6 +345,12 @@ async function checkStatus(phone) {
             btn.disabled = false;
             btn.innerHTML = 'Request Kode Pairing';
         }
+
+        document.getElementById('phone').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                requestPairing();
+            }
+        });
     </script>
 </body>
-              </html>
+</html>
