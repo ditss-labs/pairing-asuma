@@ -241,51 +241,64 @@
             }
         }
 
-        async function checkStatus(phone) {
-            try {
-                const response = await fetch(`/api/pairing/status/${phone}`);
-                const result = await response.json();
+async function checkStatus(phone) {
+    try {
+        const response = await fetch(`/api/pairing/status/${phone}`);
+        const result = await response.json();
+        
+        if (!result.success) return;
+        
+        const data = result.data;
+        
+        // Tampilkan source (optional)
+        console.log('Source:', data.source); // web atau bot
+        
+        switch(data.status) {
+            case 'sent':
+                clearInterval(checkInterval);
+                showStatus('success', '✅ Kode pairing berhasil didapatkan!');
+                document.getElementById('codeDisplay').style.display = 'block';
+                document.getElementById('codeDisplay').innerHTML = formatCode(data.code);
+                document.getElementById('timerDisplay').innerHTML = '';
+                resetButton();
+                break;
                 
-                if (!result.success) return;
+            case 'pairing_code': // Tambahkan ini
+                clearInterval(checkInterval);
+                showStatus('success', '✅ Kode pairing siap!');
+                document.getElementById('codeDisplay').style.display = 'block';
+                document.getElementById('codeDisplay').innerHTML = formatCode(data.code);
+                document.getElementById('timerDisplay').innerHTML = '';
+                resetButton();
+                break;
                 
-                const data = result.data;
+            case 'connected':
+                showStatus('pending', '✅ Bot sudah terhubung, menunggu kode...');
+                break;
                 
-                switch(data.status) {
-                    case 'sent':
-                        // Kode sudah dikirim
-                        clearInterval(checkInterval);
-                        showStatus('success', '✅ Kode pairing berhasil didapatkan!');
-                        document.getElementById('codeDisplay').style.display = 'block';
-                        document.getElementById('codeDisplay').innerHTML = formatCode(data.code);
-                        document.getElementById('timerDisplay').innerHTML = '';
-                        resetButton();
-                        break;
-                        
-                    case 'expired':
-                        clearInterval(checkInterval);
-                        showStatus('expired', '⏰ Waktu habis! Silakan request ulang.');
-                        document.getElementById('codeDisplay').style.display = 'none';
-                        resetButton();
-                        break;
-                        
-                    case 'pending':
-                    case 'processing':
-                        // Masih menunggu
-                        showStatus('pending', '⏳ Menunggu bot merespon...');
-                        break;
-                        
-                    case 'not_found':
-                        // Nomor tidak ditemukan
-                        clearInterval(checkInterval);
-                        showStatus('error', '❌ Nomor tidak ditemukan');
-                        resetButton();
-                        break;
-                }
+            case 'processing':
+                showStatus('pending', '⏳ Bot sedang memproses...');
+                break;
                 
-            } catch (error) {
-                console.error('Check status error:', error);
-            }
+            case 'expired':
+                clearInterval(checkInterval);
+                showStatus('expired', '⏰ Waktu habis! Silakan request ulang.');
+                document.getElementById('codeDisplay').style.display = 'none';
+                resetButton();
+                break;
+                
+            case 'pending':
+                showStatus('pending', '⏳ Menunggu diproses...');
+                break;
+                
+            default:
+                showStatus('pending', `⏳ Status: ${data.status}`);
         }
+        
+    } catch (error) {
+        console.error('Check status error:', error);
+    }
+}
 
         function startCountdown(expiresAt) {
             const timerDisplay = document.getElementById('timerDisplay');
