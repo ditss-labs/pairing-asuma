@@ -589,207 +589,218 @@
         </div>
     </div>
 
-    <script>
-        let checkInterval = null;
-        let countdownInterval = null;
-        let currentPhone = '';
+  <script>
+    let checkInterval = null;
+    let countdownInterval = null;
+    let currentPhone = '';
 
-        // Utility
-        function showElement(el) { el?.classList.remove('hidden'); }
-        function hideElement(el) { el?.classList.add('hidden'); }
-        function setStatusUI(type, icon, title, message) {
-            const card = document.getElementById('statusCard');
-            const iconElem = document.getElementById('statusIcon');
-            const titleElem = document.getElementById('statusTitle');
-            const msgElem = document.getElementById('statusMessage');
-            const iconBox = document.getElementById('statusIconBox');
+    function showElement(el) { el?.classList.remove('hidden'); }
+    function hideElement(el) { el?.classList.add('hidden'); }
 
-            // Set icon class
-            iconElem.className = `fas fa-${icon}`;
+    function setStatusUI(type, icon, title, message) {
+        const card = document.getElementById('statusCard');
+        const iconElem = document.getElementById('statusIcon');
+        const titleElem = document.getElementById('statusTitle');
+        const msgElem = document.getElementById('statusMessage');
+        const iconBox = document.getElementById('statusIconBox');
 
-            // Warna icon box berdasarkan tipe
-            let bgColor = '#1f2542';
-            if (type === 'success') bgColor = '#1f3a2b';
-            else if (type === 'connected') bgColor = '#1f3a4b';
-            else if (type === 'error' || type === 'expired') bgColor = '#3a2b2b';
-            else if (type === 'waiting') bgColor = '#3a322b';
-            iconBox.style.background = bgColor;
+        iconElem.className = `fas fa-${icon}`;
+        let bgColor = '#1f2542';
+        if (type === 'success') bgColor = '#1f3a2b';
+        else if (type === 'connected') bgColor = '#1f3a4b';
+        else if (type === 'error' || type === 'expired') bgColor = '#3a2b2b';
+        else if (type === 'waiting') bgColor = '#3a322b';
+        iconBox.style.background = bgColor;
 
-            titleElem.innerText = title;
-            msgElem.innerText = message;
-            card.style.display = 'block';
+        titleElem.innerText = title;
+        msgElem.innerText = message;
+        card.style.display = 'block';
+    }
+
+    function resetUI() {
+        hideElement(document.getElementById('codeDisplay'));
+        hideElement(document.getElementById('timerDisplay'));
+        hideElement(document.getElementById('whatsappAction'));
+        hideElement(document.getElementById('connectedAction'));
+        document.getElementById('statusCard').style.display = 'none';
+        clearIntervals();
+    }
+
+    function clearIntervals() {
+        if (checkInterval) clearInterval(checkInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
+    }
+
+    function resetButton() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-key"></i><span>Request Kode Pairing</span>';
+    }
+
+    function startCountdown(expiryDate) {
+        const timerDiv = document.getElementById('timerDisplay');
+        const timerText = document.getElementById('timerText');
+        showElement(timerDiv);
+
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            const now = new Date();
+            const expiry = new Date(expiryDate);
+            const diff = expiry - now;
+            if (diff <= 0) {
+                timerText.innerText = '00:00';
+                clearInterval(countdownInterval);
+            } else {
+                const mins = Math.floor(diff / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+                timerText.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            }
+        }, 1000);
+    }
+
+    async function requestPairing() {
+        const phoneInput = document.getElementById('phone');
+        const phone = phoneInput.value.replace(/\D/g, '');
+        const btn = document.getElementById('submitBtn');
+
+        if (!phone || phone.length < 10) {
+            alert('Masukkan nomor WhatsApp yang valid (minimal 10 digit)');
+            return;
         }
 
-        function resetUI() {
-            hideElement(document.getElementById('codeDisplay'));
-            hideElement(document.getElementById('timerDisplay'));
-            hideElement(document.getElementById('whatsappAction'));
-            hideElement(document.getElementById('connectedAction'));
-            document.getElementById('statusCard').style.display = 'none';
-            clearIntervals();
+        currentPhone = phone;
+        localStorage.setItem('lastPhone', phone);
+
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div><span>Memproses...</span>';
+
+        resetUI();
+
+        try {
+            const response = await fetch('/api/pairing/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                setStatusUI('waiting', 'clock', 'Permintaan Diterima', 'Menunggu bot menghasilkan kode...');
+                if (checkInterval) clearInterval(checkInterval);
+                checkInterval = setInterval(() => checkStatus(phone), 2000);
+            } else {
+                setStatusUI('error', 'exclamation-triangle', 'Gagal', result.message || 'Terjadi kesalahan');
+                resetButton();
+            }
+        } catch (error) {
+            setStatusUI('error', 'bolt', 'Error', 'Gagal terhubung ke server');
+            resetButton();
         }
+    }
 
-        function clearIntervals() {
-            if (checkInterval) clearInterval(checkInterval);
-            if (countdownInterval) clearInterval(countdownInterval);
-        }
+    async function checkStatus(phone) {
+        try {
+            const response = await fetch(`/api/pairing/status/${phone}`);
+            const result = await response.json();
+            if (!result.success) return;
 
-        function resetButton() {
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-key"></i><span>Request Kode Pairing</span>';
-        }
+            const data = result.data;
 
-        function startCountdown(expiryDate) {
-            const timerDiv = document.getElementById('timerDisplay');
-            const timerText = document.getElementById('timerText');
-            showElement(timerDiv);
+            // CEK STATUS CONNECTED DULU (prioritas utama)
+            if (data.status === 'connected') {
+                clearIntervals();               // Hentikan semua pengecekan
+                setStatusUI('connected', 'check-circle', 'Bot Connected', 'WhatsApp berhasil terhubung');
+                showElement(document.getElementById('connectedAction'));
+                hideElement(document.getElementById('codeDisplay'));
+                hideElement(document.getElementById('timerDisplay'));
+                hideElement(document.getElementById('whatsappAction'));
+                resetButton();                  // Aktifkan tombol lagi jika ingin request ulang
+                return;                          // Keluar, jangan lanjut ke switch
+            }
 
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                const now = new Date();
-                const expiry = new Date(expiryDate);
-                const diff = expiry - now;
-                if (diff <= 0) {
-                    timerText.innerText = '00:00';
-                    clearInterval(countdownInterval);
-                    // Biarkan status berubah oleh check berikutnya atau manual
-                } else {
-                    const mins = Math.floor(diff / 60000);
-                    const secs = Math.floor((diff % 60000) / 1000);
-                    timerText.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-                }
-            }, 1000);
-        }
-
-        // API Calls
-        async function requestPairing() {
-            const phoneInput = document.getElementById('phone');
-            const phone = phoneInput.value.replace(/\D/g, '');
-            const btn = document.getElementById('submitBtn');
-
-            if (!phone || phone.length < 10) {
-                alert('Masukkan nomor WhatsApp yang valid (minimal 10 digit)');
+            // Cek expired (hanya jika belum connected)
+            const now = new Date();
+            const expiry = new Date(data.expiresAt);
+            if (now > expiry && data.status !== 'connected' && data.status !== 'expired') {
+                clearIntervals();
+                setStatusUI('expired', 'hourglass-end', 'Kode Expired', 'Waktu habis, silakan request ulang');
+                resetButton();
                 return;
             }
 
-            currentPhone = phone;
-            localStorage.setItem('lastPhone', phone);
+            // Handle status lainnya
+            switch (data.status) {
+                case 'pairing_code':
+                    clearInterval(checkInterval); // Stop polling karena kode sudah dapat
+                    setStatusUI('success', 'gem', 'Kode Pairing Siap', 'Masukkan kode berikut di WhatsApp:');
+                    document.getElementById('codeValue').innerText = data.code || 'GNMC-S24C';
+                    showElement(document.getElementById('codeDisplay'));
+                    showElement(document.getElementById('whatsappAction'));
+                    hideElement(document.getElementById('connectedAction'));
+                    startCountdown(expiry);
+                    break;
 
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner"></div><span>Memproses...</span>';
+                case 'processing':
+                case 'pending':
+                    setStatusUI('waiting', 'spinner', 'Memproses', 'Bot sedang menyiapkan kode...');
+                    break;
 
-            resetUI();
+                case 'sent':
+                    setStatusUI('waiting', 'paper-plane', 'Kode Terkirim', 'Kode sudah dikirim, cek WhatsApp Anda');
+                    break;
 
-            try {
-                const response = await fetch('/api/pairing/request', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone })
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    setStatusUI('waiting', 'clock', 'Permintaan Diterima', 'Menunggu bot menghasilkan kode...');
-                    if (checkInterval) clearInterval(checkInterval);
-                    checkInterval = setInterval(() => checkStatus(phone), 2000);
-                } else {
-                    setStatusUI('error', 'exclamation-triangle', 'Gagal', result.message || 'Terjadi kesalahan');
-                    resetButton();
-                }
-            } catch (error) {
-                setStatusUI('error', 'bolt', 'Error', 'Gagal terhubung ke server');
-                resetButton();
-            }
-        }
-
-        async function checkStatus(phone) {
-            try {
-                const response = await fetch(`/api/pairing/status/${phone}`);
-                const result = await response.json();
-                if (!result.success) return;
-
-                const data = result.data;
-
-                // Priority: connected
-                if (data.status === 'connected') {
+                case 'expired':
                     clearIntervals();
-                    setStatusUI('connected', 'check-circle', 'Bot Connected', 'WhatsApp berhasil terhubung');
+                    setStatusUI('expired', 'hourglass-end', 'Expired', 'Kode telah kadaluarsa');
+                    resetButton();
+                    break;
+
+                case 'failed':
+                    setStatusUI('error', 'times-circle', 'Gagal', 'Bot gagal menghasilkan kode');
+                    resetButton();
+                    break;
+
+                case 'existing':
+                    setStatusUI('connected', 'check-double', 'Bot Sudah Ada', 'Bot sudah terhubung sebelumnya');
                     showElement(document.getElementById('connectedAction'));
-                    hideElement(document.getElementById('whatsappAction'));
-                    hideElement(document.getElementById('codeDisplay'));
-                    hideElement(document.getElementById('timerDisplay'));
                     resetButton();
-                    return;
-                }
+                    break;
 
-                // Cek expired
-                const now = new Date();
-                const expiry = new Date(data.expiresAt);
-                if (now > expiry && data.status !== 'connected' && data.status !== 'expired') {
-                    clearIntervals();
-                    setStatusUI('expired', 'hourglass-end', 'Kode Expired', 'Waktu habis, silakan request ulang');
+                case 'logged_out':
+                    setStatusUI('error', 'sign-out-alt', 'Logged Out', 'Bot telah logout');
                     resetButton();
-                    return;
-                }
+                    break;
 
-                switch (data.status) {
-                    case 'pairing_code':
+                case 'stopped':
+                    setStatusUI('error', 'stop-circle', 'Dihentikan', 'Bot sedang tidak aktif');
+                    resetButton();
+                    break;
+
+                default:
+                    if (data.code) {
                         clearInterval(checkInterval);
-                        setStatusUI('success', 'gem', 'Kode Pairing Siap', 'Masukkan kode berikut di WhatsApp:');
-                        document.getElementById('codeValue').innerText = data.code || 'GNMC-S24C';
+                        setStatusUI('success', 'gem', 'Kode Pairing', 'Masukkan kode di WhatsApp:');
+                        document.getElementById('codeValue').innerText = data.code;
                         showElement(document.getElementById('codeDisplay'));
                         showElement(document.getElementById('whatsappAction'));
-                        hideElement(document.getElementById('connectedAction'));
-
-                        const waLink = document.getElementById('whatsappLink');
-                        waLink.href = `https://wa.me/${currentPhone}`;
                         startCountdown(expiry);
-                        break;
-
-                    case 'processing':
-                    case 'pending':
-                        setStatusUI('waiting', 'spinner', 'Memproses', 'Bot sedang menyiapkan kode...');
-                        break;
-
-                    case 'expired':
-                        clearIntervals();
-                        setStatusUI('expired', 'hourglass-end', 'Expired', 'Kode telah kadaluarsa');
-                        resetButton();
-                        break;
-
-                    case 'failed':
-                        setStatusUI('error', 'times-circle', 'Gagal', 'Bot gagal menghasilkan kode');
-                        resetButton();
-                        break;
-
-                    default:
-                        if (data.code) {
-                            clearInterval(checkInterval);
-                            setStatusUI('success', 'gem', 'Kode Pairing', 'Masukkan kode di WhatsApp:');
-                            document.getElementById('codeValue').innerText = data.code;
-                            showElement(document.getElementById('codeDisplay'));
-                            showElement(document.getElementById('whatsappAction'));
-                            startCountdown(expiry);
-                        } else {
-                            setStatusUI('waiting', 'clock', 'Menunggu', `Status: ${data.status}`);
-                        }
-                }
-            } catch (error) {
-                console.error('Status check error:', error);
+                    } else {
+                        setStatusUI('waiting', 'clock', 'Menunggu', `Status: ${data.status}`);
+                    }
             }
+        } catch (error) {
+            console.error('Status check error:', error);
         }
+    }
 
-        // Enter key
-        document.getElementById('phone').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') requestPairing();
-        });
+    document.getElementById('phone').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') requestPairing();
+    });
 
-        // Load last phone
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('lastPhone');
-            if (saved) document.getElementById('phone').value = saved;
-        });
-    </script>
+    window.addEventListener('load', () => {
+        const saved = localStorage.getItem('lastPhone');
+        if (saved) document.getElementById('phone').value = saved;
+    });
+</script>
 </body>
 </html>
