@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session')
 const path = require('path');
 const cors = require('cors');
 const chalk = require('chalk');
@@ -12,65 +13,84 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 connectDB();
-app.get("/l", (req, res) => {
-  // Kasih HTML loading dulu
-  res.send(`
+app.use(session({
+  secret: 'asauma-bot-bogor-ditss-sunda',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000 
+  }
+}))
+const checkVerification = (req, res, next) => {
+  if (req.session.verified) {
+    return next()
+  }
+  res.redirect('/verifikasi')
+}
+
+app.get('/verifikasi', (req, res) => {
+  if (req.session.verified) {
+    return res.redirect('/')
+  }
+  
+  const loadingHtml = `
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Loading...</title>
+        <title>Verifikasi...</title>
         <style>
-            body {
-                margin: 0;
-                padding: 0;
-                background: linear-gradient(135deg, #667eea, #764ba2);
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-family: Arial, sans-serif;
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: Arial, sans-serif; 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                height: 100vh; 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
             }
-            .loader {
+            .loading-container { text-align: center; color: white; }
+            .loading-spinner {
+                width: 50px; height: 50px;
                 border: 5px solid #f3f3f3;
                 border-top: 5px solid #3498db;
                 border-radius: 50%;
-                width: 50px;
-                height: 50px;
                 animation: spin 1s linear infinite;
+                margin: 20px auto;
             }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            p {
-                color: white;
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            .loading-text { font-size: 24px; margin-bottom: 10px; }
+            .info { 
+                font-size: 14px; 
+                opacity: 0.8;
                 margin-top: 20px;
             }
         </style>
     </head>
     <body>
-        <div style="text-align: center">
-            <div class="loader"></div>
-            <p>Verifying...</p>
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Verifikasi...</div>
+            <div class="info">Tunggu 1 detik ya</div>
         </div>
         
         <script>
-            // Redirect ke halaman yang sama setelah 1 detik
-            // Tapi dengan parameter biar ga loading lagi
             setTimeout(() => {
-                window.location.href = '/?verified=true';
+                window.location.href = '/verifikasi/proses';
             }, 1000);
         </script>
     </body>
     </html>
-  `)
+  `
+  
+  res.send(loadingHtml)
 })
-app.get("/", (req, res) => {
-  if (req.query.verified === 'true') {
-    res.sendFile(path.join(__dirname, "page", "index.html"))
-  } else {
-    res.redirect('/l')
-  }
+app.get('/verifikasi/proses', (req, res) => {
+  req.session.verified = true
+  req.session.verifiedAt = new Date().toISOString()
+  res.redirect('/')
+})
+app.get('/', checkVerification, (req, res) => {
+  res.sendFile(path.join(__dirname, "page", "index.html"))
 })
 app.post('/api/pairing/request', async (req, res) => {
   try {
