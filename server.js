@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const chalk = require('chalk');
 const connectDB = require('./config/database');
 const Pairing = require('./models/Pairing');
 
