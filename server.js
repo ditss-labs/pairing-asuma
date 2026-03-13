@@ -13,7 +13,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 connectDB();
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname,"page", "index.html"))
+  setTimeout(() => {
+    res.sendFile(path.join(__dirname, "page", "index.html"))
+  }, 1000)
 })
 app.post('/api/pairing/request', async (req, res) => {
   try {
