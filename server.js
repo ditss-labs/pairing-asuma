@@ -12,10 +12,65 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 connectDB();
+app.get("/l", (req, res) => {
+  // Kasih HTML loading dulu
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Loading...</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+            }
+            .loader {
+                border: 5px solid #f3f3f3;
+                border-top: 5px solid #3498db;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            p {
+                color: white;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="text-align: center">
+            <div class="loader"></div>
+            <p>Verifying...</p>
+        </div>
+        
+        <script>
+            // Redirect ke halaman yang sama setelah 1 detik
+            // Tapi dengan parameter biar ga loading lagi
+            setTimeout(() => {
+                window.location.href = '/?verified=true';
+            }, 1000);
+        </script>
+    </body>
+    </html>
+  `)
+})
 app.get("/", (req, res) => {
-  setTimeout(() => {
+  if (req.query.verified === 'true') {
     res.sendFile(path.join(__dirname, "page", "index.html"))
-  }, 1000)
+  } else {
+    res.redirect('/l')
+  }
 })
 app.post('/api/pairing/request', async (req, res) => {
   try {
