@@ -3,17 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asuma Bot - Pairing Code Generator</title>
-    <meta name="description" content="Generate kode pairing WhatsApp dengan cepat dan mudah. Hubungkan bot WhatsApp Anda dalam hitungan detik.">
-    <meta name="keywords" content="whatsapp bot, pairing code, wa bot generator, asuma bot">
-    <meta name="author" content="Asuma Bot">
-    <meta property="og:title" content="Asuma Bot - Pairing Code Generator">
-    <meta property="og:description" content="Generate kode pairing WhatsApp dengan cepat dan mudah">
+    
+    <!-- Primary Meta Tags -->
+    <title>Asuma Bot | Pairing Code Generator untuk WhatsApp</title>
+    <meta name="title" content="Asuma Bot - Pairing Code Generator WhatsApp">
+    <meta name="description" content="Hasilkan kode pairing WhatsApp dengan cepat dan mudah. Hubungkan bot WhatsApp Anda dalam hitungan detik. Gratis dan aman.">
+    <meta name="keywords" content="whatsapp bot, pairing code, wa bot, generator kode pairing, asuma bot, whatsapp api">
+    <meta name="author" content="Asuma Team">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="id">
+    <meta name="revisit-after" content="1 days">
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asuma.my.id/">
+    <meta property="og:title" content="Asuma Bot - Pairing Code Generator WhatsApp">
+    <meta property="og:description" content="Hasilkan kode pairing WhatsApp dengan cepat dan mudah. Hubungkan bot WhatsApp Anda dalam hitungan detik.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/4f46e5/ffffff?text=Asuma+Bot">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://asuma.my.id/">
+    <meta property="twitter:title" content="Asuma Bot - Pairing Code Generator WhatsApp">
+    <meta property="twitter:description" content="Hasilkan kode pairing WhatsApp dengan cepat dan mudah. Hubungkan bot WhatsApp Anda dalam hitungan detik.">
+    <meta property="twitter:image" content="https://via.placeholder.com/1200x630/4f46e5/ffffff?text=Asuma+Bot">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%234f46e5'/%3E%3Cpath d='M11 13 L21 13 L21 15 L11 15 Z M11 17 L21 17 L21 19 L11 19 Z' fill='white'/%3E%3C/svg%3E">
+    
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         * {
             margin: 0;
@@ -22,8 +45,8 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0c14;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #0b0f1c;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -33,6 +56,7 @@
             overflow-x: hidden;
         }
 
+        /* Animated background */
         body::before {
             content: '';
             position: fixed;
@@ -40,9 +64,26 @@
             height: 100%;
             top: 0;
             left: 0;
-            background: radial-gradient(circle at 20% 30%, rgba(79, 70, 229, 0.12) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 40%, rgba(79, 70, 229, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                        linear-gradient(145deg, #0b0f1c 0%, #1a1f33 100%);
+            z-index: -2;
+        }
+
+        /* Grid overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: 
+                linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
+            pointer-events: none;
         }
 
         .container {
@@ -52,17 +93,19 @@
             z-index: 10;
         }
 
-        .decor {
+        /* Decorative elements */
+        .decor-1 {
             position: absolute;
-            top: -20px;
-            right: -20px;
+            top: -30px;
+            right: -30px;
             width: 200px;
             height: 200px;
-            background: linear-gradient(145deg, #4f46e5, #c084fc);
+            background: linear-gradient(135deg, #4f46e5 0%, #c084fc 100%);
             border-radius: 50%;
-            filter: blur(70px);
+            filter: blur(60px);
             opacity: 0.2;
             z-index: -1;
+            animation: float 8s ease-in-out infinite;
         }
 
         .decor-2 {
@@ -71,84 +114,112 @@
             left: -40px;
             width: 250px;
             height: 250px;
-            background: linear-gradient(145deg, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             border-radius: 50%;
-            filter: blur(80px);
+            filter: blur(70px);
             opacity: 0.15;
             z-index: -1;
+            animation: float 12s ease-in-out infinite reverse;
         }
 
-        .header {
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, 20px) scale(1.1); }
+        }
+
+        /* Brand / Header */
+        .brand {
             text-align: center;
             margin-bottom: 2.5rem;
+            position: relative;
         }
 
-        .logo {
+        .brand-icon {
             width: 90px;
             height: 90px;
-            background: #151c2c;
+            background: linear-gradient(145deg, #2a2f4b, #1e2338);
             border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
+            box-shadow: 
+                0 20px 30px -10px rgba(0, 0, 0, 0.5),
+                inset 0 -2px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
-        .logo i {
+        .brand-icon i {
             font-size: 3.5rem;
-            color: #4f46e5;
-            filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.4));
+            background: linear-gradient(135deg, #a5b4fc, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 6px rgba(79, 70, 229, 0.3));
         }
 
-        .header h1 {
+        .brand h1 {
             font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(145deg, #ffffff, #a0aec0);
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
             margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
         }
 
-        .header p {
-            color: #6b7a99;
-            font-weight: 500;
+        .brand .sub {
             font-size: 1rem;
+            color: #94a3b8;
+            font-weight: 500;
             background: rgba(255, 255, 255, 0.02);
-            padding: 0.4rem 1.2rem;
-            border-radius: 100px;
+            backdrop-filter: blur(4px);
             display: inline-block;
+            padding: 0.35rem 1.2rem;
+            border-radius: 100px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* Main Card */
         .card {
-            background: rgba(18, 24, 41, 0.7);
+            background: rgba(18, 22, 40, 0.7);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 2.5rem;
             padding: 2.2rem;
-            box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+            box-shadow: 
+                0 30px 60px -20px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 40px 70px -20px #4f46e540;
+            border-color: rgba(79, 70, 229, 0.2);
+        }
+
+        .input-wrapper {
+            margin-bottom: 2rem;
         }
 
         .input-label {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: #d1d9f0;
-            font-weight: 600;
+            color: #e2e8f0;
             font-size: 0.95rem;
+            font-weight: 600;
             margin-bottom: 0.75rem;
         }
 
         .input-label i {
-            color: #4f46e5;
+            color: #818cf8;
+            font-size: 1rem;
         }
 
         .input-field {
             position: relative;
-            margin-bottom: 2rem;
         }
 
         .input-field i {
@@ -156,27 +227,34 @@
             left: 1.2rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #4f46e5;
-            font-size: 1.2rem;
-            opacity: 0.7;
+            color: #64748b;
+            font-size: 1.25rem;
+            transition: color 0.2s;
         }
 
         .input-field input {
             width: 100%;
             padding: 1.2rem 1.2rem 1.2rem 3.5rem;
-            background: #0f1629;
-            border: 2px solid #262f47;
+            background: #101629;
+            border: 2px solid #2d334f;
             border-radius: 1.5rem;
             font-size: 1.1rem;
-            color: #ffffff;
+            color: #f1f5f9;
             font-weight: 500;
+            font-family: 'Plus Jakarta Sans', monospace;
             transition: all 0.2s ease;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
         .input-field input:focus {
             outline: none;
             border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), inset 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .input-field input::placeholder {
+            color: #3f4665;
+            font-weight: 400;
         }
 
         .btn {
@@ -189,37 +267,57 @@
             font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            transition: all 0.2s ease;
+            box-shadow: 0 10px 20px -5px #4f46e580;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 20px -5px #4f46e5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover:not(:disabled) {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
             box-shadow: 0 20px 30px -5px #4f46e5;
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.7;
             cursor: not-allowed;
+            filter: grayscale(0.5);
         }
 
-        .status {
+        /* Status card */
+        .status-card {
             margin-top: 2rem;
             padding: 1.5rem;
-            border-radius: 2rem;
-            background: #0f1629;
-            border: 1px solid #262f47;
+            border-radius: 1.8rem;
+            background: rgba(10, 14, 27, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeSlide 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -230,90 +328,121 @@
             margin-bottom: 1.2rem;
         }
 
-        .status-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
+        .status-icon-box {
+            width: 50px;
+            height: 50px;
+            background: #1f2542;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .status-icon.waiting { background: #2a2825; color: #fbbf24; }
-        .status-icon.success { background: #1a2a1f; color: #4ade80; }
-        .status-icon.connected { background: #1a2a33; color: #38bdf8; }
-        .status-icon.expired { background: #2a1f1f; color: #f87171; }
-        .status-icon.error { background: #2a1f1f; color: #f87171; }
+        .status-icon-box i {
+            font-size: 1.8rem;
+        }
 
         .status-title {
-            font-weight: 700;
+            flex: 1;
+        }
+
+        .status-title h3 {
             font-size: 1.2rem;
-            color: #ffffff;
+            font-weight: 700;
+            color: white;
             margin-bottom: 0.2rem;
         }
 
-        .status-message {
-            font-size: 0.9rem;
-            color: #8a9bb5;
+        .status-title p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .status-body {
+            text-align: center;
         }
 
         .code-box {
-            background: #0a0f1c;
-            border: 2px dashed #2a3450;
+            background: #0c1020;
+            padding: 1.8rem 1rem;
             border-radius: 1.5rem;
-            padding: 1.5rem;
-            text-align: center;
-            margin: 1.2rem 0;
+            margin: 1.5rem 0;
+            border: 2px dashed #2d334f;
             position: relative;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
         }
 
         .code-box span {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 800;
-            letter-spacing: 6px;
-            background: linear-gradient(145deg, #a5b4fc, #818cf8);
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #a5b4fc, #818cf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px #4f46e5;
         }
 
         .timer {
-            text-align: center;
-            color: #8a9bb5;
-            font-size: 0.95rem;
-            margin: 1rem 0;
-            background: #151e30;
-            padding: 0.5rem;
-            border-radius: 2rem;
+            font-size: 1rem;
+            color: #94a3b8;
+            background: #1e2338;
             display: inline-block;
-            width: auto;
             padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            border: 1px solid #2d334f;
         }
 
         .timer i {
+            margin-right: 0.4rem;
             color: #fbbf24;
-            margin-right: 0.5rem;
         }
 
-        .whatsapp-btn {
-            display: flex;
+        .whatsapp-button {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.7rem;
             background: #25D366;
             color: white;
             text-decoration: none;
-            padding: 1rem;
+            padding: 1rem 2rem;
             border-radius: 2rem;
             font-weight: 600;
+            font-size: 1rem;
             margin: 1rem 0 0.5rem;
             transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
         }
 
-        .whatsapp-btn:hover {
+        .whatsapp-button:hover {
             background: #20ba5c;
             transform: scale(1.02);
+            box-shadow: 0 10px 20px -5px #25D36680;
+        }
+
+        .steps-guide {
+            background: #101629;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #2d334f;
+        }
+
+        .steps-guide .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+        }
+
+        .steps-guide .step-item i {
+            width: 22px;
+            color: #4f46e5;
         }
 
         .connected-badge {
@@ -321,41 +450,20 @@
             align-items: center;
             justify-content: center;
             gap: 0.7rem;
-            background: #1a2a33;
+            background: #1f3a4b;
             color: #38bdf8;
             padding: 1.2rem;
             border-radius: 1.5rem;
             border: 1px solid #38bdf8;
             font-weight: 600;
-            margin: 1rem 0;
         }
 
         .connected-badge i {
-            font-size: 1.8rem;
+            font-size: 2rem;
+            color: #38bdf8;
         }
 
-        .steps {
-            background: #0a0f1c;
-            border-radius: 1.2rem;
-            padding: 1rem;
-            margin-top: 1rem;
-            border: 1px solid #262f47;
-        }
-
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            color: #b4c3da;
-            font-size: 0.9rem;
-            padding: 0.5rem 0;
-        }
-
-        .step-item i {
-            width: 20px;
-            color: #4f46e5;
-        }
-
+        /* Loading spinner */
         .spinner {
             width: 24px;
             height: 24px;
@@ -369,346 +477,330 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Footer */
+        .footer {
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            margin-left: 1.2rem;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #818cf8;
+        }
+
+        /* Utility classes */
         .hidden {
             display: none !important;
         }
 
-        .footer {
-            margin-top: 2rem;
-            text-align: center;
-            color: #50607a;
-            font-size: 0.85rem;
-        }
-
-        .debug {
-            color: #50607a;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 1rem;
-            border-top: 1px solid #262f47;
-            padding-top: 1rem;
-        }
+        .text-accent { color: #818cf8; }
+        .bg-gradient { background: linear-gradient(145deg, #4f46e5, #7c3aed); }
     </style>
 </head>
 <body>
-    <div class="decor"></div>
-    <div class="decor-2"></div>
-
     <div class="container">
-        <div class="header">
-            <div class="logo">
+        <div class="decor-1"></div>
+        <div class="decor-2"></div>
+
+        <div class="brand">
+            <div class="brand-icon">
                 <i class="fas fa-robot"></i>
             </div>
             <h1>Asuma Bot</h1>
-            <p>Pairing Code Generator</p>
+            <div class="sub">Pairing Code Generator</div>
         </div>
 
         <div class="card">
-            <div class="input-label">
-                <i class="fas fa-phone-alt"></i>
-                <span>Nomor WhatsApp</span>
-            </div>
-            <div class="input-field">
-                <i class="fas fa-hashtag"></i>
-                <input type="text" id="phone" placeholder="628123456789" value="447920601019">
+            <div class="input-wrapper">
+                <label class="input-label">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>Nomor WhatsApp</span>
+                </label>
+                <div class="input-field">
+                    <i class="fas fa-hashtag"></i>
+                    <input type="text" id="phone" placeholder="628123456789" value="447920601019" autocomplete="off">
+                </div>
             </div>
 
-            <button class="btn" id="requestBtn">
+            <button class="btn" id="submitBtn" onclick="requestPairing()">
                 <i class="fas fa-key"></i>
                 <span>Request Kode Pairing</span>
             </button>
 
-            <div id="status" class="status">
+            <!-- Status Card -->
+            <div id="statusCard" class="status-card">
                 <div class="status-header">
-                    <div id="statusIcon" class="status-icon waiting">
-                        <i class="fas fa-clock"></i>
+                    <div class="status-icon-box" id="statusIconBox">
+                        <i class="fas fa-clock" id="statusIcon"></i>
                     </div>
-                    <div>
-                        <div id="statusTitle" class="status-title">Menunggu</div>
-                        <div id="statusMessage" class="status-message">Memproses permintaan...</div>
-                    </div>
-                </div>
-
-                <div id="codeDisplay" class="code-box hidden">
-                    <span id="codeValue">GNMC-S24C</span>
-                </div>
-
-                <div id="timerDisplay" class="timer hidden">
-                    <i class="fas fa-hourglass-half"></i>
-                    <span id="timerText">05:00</span>
-                </div>
-
-                <div id="whatsappAction" class="hidden">
-                    <a href="#" id="whatsappLink" class="whatsapp-btn" target="_blank">
-                        <i class="fab fa-whatsapp"></i> Buka WhatsApp
-                    </a>
-                    <div class="steps">
-                        <div class="step-item"><i class="fas fa-mobile-alt"></i> Buka WhatsApp di HP</div>
-                        <div class="step-item"><i class="fas fa-keyboard"></i> Masukkan kode pairing</div>
-                        <div class="step-item"><i class="fas fa-sync-alt"></i> Tunggu hingga terhubung</div>
+                    <div class="status-title">
+                        <h3 id="statusTitle">Menunggu</h3>
+                        <p id="statusMessage">Memproses permintaan...</p>
                     </div>
                 </div>
-
-                <div id="connectedAction" class="hidden">
-                    <div class="connected-badge">
-                        <i class="fas fa-check-circle"></i>
-                        <div>
-                            <div style="font-weight:700;">Bot Connected</div>
-                            <div style="font-size:0.85rem; opacity:0.8;">WhatsApp siap digunakan</div>
+                <div class="status-body">
+                    <div id="codeDisplay" class="code-box hidden">
+                        <span id="codeValue">GNMC-S24C</span>
+                    </div>
+                    <div id="timerDisplay" class="timer hidden">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span id="timerText">05:00</span>
+                    </div>
+                    <div id="whatsappAction" class="hidden">
+                        <a href="#" id="whatsappLink" class="whatsapp-button" target="_blank">
+                            <i class="fab fa-whatsapp"></i> Buka WhatsApp
+                        </a>
+                        <div class="steps-guide">
+                            <div class="step-item"><i class="fas fa-mobile-alt"></i> Buka WhatsApp di HP</div>
+                            <div class="step-item"><i class="fas fa-keyboard"></i> Masukkan kode pairing</div>
+                            <div class="step-item"><i class="fas fa-check-circle"></i> Tunggu hingga terhubung</div>
+                        </div>
+                    </div>
+                    <div id="connectedAction" class="hidden">
+                        <div class="connected-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <div style="font-weight:700; font-size:1.1rem;">Bot Connected</div>
+                                <div style="font-size:0.85rem; opacity:0.8;">WhatsApp siap digunakan</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div id="debugInfo" class="debug">
-                Status: <span id="debugStatus">-</span> | Polling: <span id="debugPolling">off</span>
-            </div>
         </div>
 
         <div class="footer">
-            © 2026 Asuma Bot - All rights reserved
+            <span>© 2026 Asuma Bot</span>
+            <div class="footer-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+            </div>
         </div>
     </div>
 
-    <script>
-        let pollInterval = null;
-        let timerInterval = null;
-        let currentPhone = '';
-        let isPolling = false;
+<script>
+    let checkInterval = null;
+    let countdownInterval = null;
+    let currentPhone = '';
 
-        const elements = {
-            phone: document.getElementById('phone'),
-            requestBtn: document.getElementById('requestBtn'),
-            status: document.getElementById('status'),
-            statusIcon: document.getElementById('statusIcon'),
-            statusTitle: document.getElementById('statusTitle'),
-            statusMessage: document.getElementById('statusMessage'),
-            codeDisplay: document.getElementById('codeDisplay'),
-            codeValue: document.getElementById('codeValue'),
-            timerDisplay: document.getElementById('timerDisplay'),
-            timerText: document.getElementById('timerText'),
-            whatsappAction: document.getElementById('whatsappAction'),
-            whatsappLink: document.getElementById('whatsappLink'),
-            connectedAction: document.getElementById('connectedAction'),
-            debugStatus: document.getElementById('debugStatus'),
-            debugPolling: document.getElementById('debugPolling')
-        };
+    function showElement(el) { el?.classList.remove('hidden'); }
+    function hideElement(el) { el?.classList.add('hidden'); }
 
-        function show(el) { el?.classList.remove('hidden'); }
-        function hide(el) { el?.classList.add('hidden'); }
+    function setStatusUI(type, icon, title, message) {
+        const card = document.getElementById('statusCard');
+        const iconElem = document.getElementById('statusIcon');
+        const titleElem = document.getElementById('statusTitle');
+        const msgElem = document.getElementById('statusMessage');
+        const iconBox = document.getElementById('statusIconBox');
 
-        function stopAllIntervals() {
-            if (pollInterval) {
-                clearInterval(pollInterval);
-                pollInterval = null;
+        iconElem.className = `fas fa-${icon}`;
+        let bgColor = '#1f2542';
+        if (type === 'success') bgColor = '#1f3a2b';
+        else if (type === 'connected') bgColor = '#1f3a4b';
+        else if (type === 'error' || type === 'expired') bgColor = '#3a2b2b';
+        else if (type === 'waiting') bgColor = '#3a322b';
+        iconBox.style.background = bgColor;
+
+        titleElem.innerText = title;
+        msgElem.innerText = message;
+        card.style.display = 'block';
+    }
+
+    function resetUI() {
+        hideElement(document.getElementById('codeDisplay'));
+        hideElement(document.getElementById('timerDisplay'));
+        hideElement(document.getElementById('whatsappAction'));
+        hideElement(document.getElementById('connectedAction'));
+        document.getElementById('statusCard').style.display = 'none';
+        clearIntervals();
+    }
+
+    function clearIntervals() {
+        if (checkInterval) clearInterval(checkInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
+    }
+
+    function resetButton() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-key"></i><span>Request Kode Pairing</span>';
+    }
+
+    function startCountdown(expiryDate) {
+        const timerDiv = document.getElementById('timerDisplay');
+        const timerText = document.getElementById('timerText');
+        showElement(timerDiv);
+
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            const now = new Date();
+            const expiry = new Date(expiryDate);
+            const diff = expiry - now;
+            if (diff <= 0) {
+                timerText.innerText = '00:00';
+                clearInterval(countdownInterval);
+            } else {
+                const mins = Math.floor(diff / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+                timerText.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
             }
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
+        }, 1000);
+    }
+
+    async function requestPairing() {
+        const phoneInput = document.getElementById('phone');
+        const phone = phoneInput.value.replace(/\D/g, '');
+        const btn = document.getElementById('submitBtn');
+
+        if (!phone || phone.length < 10) {
+            alert('Masukkan nomor WhatsApp yang valid (minimal 10 digit)');
+            return;
+        }
+
+        currentPhone = phone;
+        localStorage.setItem('lastPhone', phone);
+
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div><span>Memproses...</span>';
+
+        resetUI();
+
+        try {
+            const response = await fetch('/api/pairing/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                setStatusUI('waiting', 'clock', 'Permintaan Diterima', 'Menunggu bot menghasilkan kode...');
+                if (checkInterval) clearInterval(checkInterval);
+                checkInterval = setInterval(() => checkStatus(phone), 2000);
+            } else {
+                setStatusUI('error', 'exclamation-triangle', 'Gagal', result.message || 'Terjadi kesalahan');
+                resetButton();
             }
-            isPolling = false;
-            updateDebugPolling();
+        } catch (error) {
+            setStatusUI('error', 'bolt', 'Error', 'Gagal terhubung ke server');
+            resetButton();
         }
+    }
 
-        function updateDebugPolling() {
-            elements.debugPolling.innerText = isPolling ? 'on' : 'off';
-        }
+    async function checkStatus(phone) {
+        try {
+            const response = await fetch(`/api/pairing/status/${phone}`);
+            const result = await response.json();
+            if (!result.success) return;
 
-        function resetUI() {
-            hide(elements.status);
-            hide(elements.codeDisplay);
-            hide(elements.timerDisplay);
-            hide(elements.whatsappAction);
-            hide(elements.connectedAction);
-            stopAllIntervals();
-        }
+            const data = result.data;
 
-        function setStatus(type, icon, title, message) {
-            elements.statusIcon.className = `status-icon ${type}`;
-            elements.statusIcon.innerHTML = `<i class="fas ${icon}"></i>`;
-            elements.statusTitle.innerText = title;
-            elements.statusMessage.innerText = message;
-            show(elements.status);
-        }
+            // CEK STATUS CONNECTED DULU (prioritas utama)
+            if (data.status === 'connected') {
+                clearIntervals();               // Hentikan semua pengecekan
+                setStatusUI('connected', 'check-circle', 'Bot Connected', 'WhatsApp berhasil terhubung');
+                showElement(document.getElementById('connectedAction'));
+                hideElement(document.getElementById('codeDisplay'));
+                hideElement(document.getElementById('timerDisplay'));
+                hideElement(document.getElementById('whatsappAction'));
+                resetButton();                  // Aktifkan tombol lagi jika ingin request ulang
+                return;                          // Keluar, jangan lanjut ke switch
+            }
 
-        function enableButton() {
-            elements.requestBtn.disabled = false;
-            elements.requestBtn.innerHTML = '<i class="fas fa-key"></i><span>Request Kode Pairing</span>';
-        }
-
-        function disableButton(text) {
-            elements.requestBtn.disabled = true;
-            elements.requestBtn.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
-        }
-
-        function startTimer(expiryTime) {
-            const expiry = new Date(expiryTime);
-            show(elements.timerDisplay);
-            
-            if (timerInterval) clearInterval(timerInterval);
-            
-            timerInterval = setInterval(() => {
-                const now = new Date();
-                const diff = expiry - now;
-                
-                if (diff <= 0) {
-                    elements.timerText.innerText = '00:00';
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                } else {
-                    const mins = Math.floor(diff / 60000);
-                    const secs = Math.floor((diff % 60000) / 1000);
-                    elements.timerText.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-                }
-            }, 1000);
-        }
-
-        async function requestPairing() {
-            const phone = elements.phone.value.replace(/\D/g, '');
-            
-            if (!phone || phone.length < 10) {
-                alert('Nomor WhatsApp tidak valid (minimal 10 digit)');
+            // Cek expired (hanya jika belum connected)
+            const now = new Date();
+            const expiry = new Date(data.expiresAt);
+            if (now > expiry && data.status !== 'connected' && data.status !== 'expired') {
+                clearIntervals();
+                setStatusUI('expired', 'hourglass-end', 'Kode Expired', 'Waktu habis, silakan request ulang');
+                resetButton();
                 return;
             }
 
-            currentPhone = phone;
-            localStorage.setItem('lastPhone', phone);
-            
-            disableButton('Memproses...');
-            resetUI();
-            
-            try {
-                const response = await fetch('/api/pairing/request', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    setStatus('waiting', 'fa-clock', 'Permintaan Diterima', 'Menunggu kode dari bot...');
-                    stopAllIntervals();
-                    pollInterval = setInterval(() => checkStatus(phone), 2000);
-                    isPolling = true;
-                    updateDebugPolling();
-                } else {
-                    setStatus('error', 'fa-exclamation-triangle', 'Gagal', result.message || 'Terjadi kesalahan');
-                    enableButton();
-                }
-            } catch (error) {
-                setStatus('error', 'fa-bolt', 'Error', 'Gagal terhubung ke server');
-                enableButton();
-            }
-        }
+            // Handle status lainnya
+            switch (data.status) {
+                case 'pairing_code':
+                    clearInterval(checkInterval); // Stop polling karena kode sudah dapat
+                    setStatusUI('success', 'gem', 'Kode Pairing Siap', 'Masukkan kode berikut di WhatsApp:');
+                    document.getElementById('codeValue').innerText = data.code || 'GNMC-S24C';
+                    showElement(document.getElementById('codeDisplay'));
+                    showElement(document.getElementById('whatsappAction'));
+                    hideElement(document.getElementById('connectedAction'));
+                    startCountdown(expiry);
+                    break;
 
-        async function checkStatus(phone) {
-            if (!isPolling) return;
-            
-            try {
-                const response = await fetch(`/api/pairing/status/${phone}`);
-                const result = await response.json();
-                
-                if (!result.success) return;
-                
-                const data = result.data;
-                const status = data.status;
-                
-                elements.debugStatus.innerText = status;
-                
-                if (status === 'connected' || status === 'existing') {
-                    setStatus('connected', 'fa-check-circle', 'Bot Connected', 'WhatsApp berhasil terhubung');
-                    show(elements.connectedAction);
-                    hide(elements.codeDisplay);
-                    hide(elements.timerDisplay);
-                    hide(elements.whatsappAction);
-                    stopAllIntervals();
-                    enableButton();
-                    return;
-                }
-                
-                const now = new Date();
-                const expiry = new Date(data.expiresAt);
-                
-                if (now > expiry && status !== 'connected' && status !== 'expired') {
-                    setStatus('expired', 'fa-hourglass-end', 'Kode Expired', 'Waktu habis, request ulang');
-                    stopAllIntervals();
-                    enableButton();
-                    return;
-                }
-                
-                if (status === 'pairing_code' || data.code) {
-                    setStatus('success', 'fa-gem', 'Kode Pairing Siap', 'Masukkan kode berikut di WhatsApp:');
-                    elements.codeValue.innerText = data.code || 'GNMC-S24C';
-                    show(elements.codeDisplay);
-                    show(elements.whatsappAction);
-                    hide(elements.connectedAction);
-                    elements.whatsappLink.href = `https://wa.me/${phone}`;
-                    
-                    if (data.expiresAt) {
-                        startTimer(data.expiresAt);
+                case 'processing':
+                case 'pending':
+                    setStatusUI('waiting', 'spinner', 'Memproses', 'Bot sedang menyiapkan kode...');
+                    break;
+
+                case 'sent':
+                    setStatusUI('waiting', 'paper-plane', 'Kode Terkirim', 'Kode sudah dikirim, cek WhatsApp Anda');
+                    break;
+
+                case 'expired':
+                    clearIntervals();
+                    setStatusUI('expired', 'hourglass-end', 'Expired', 'Kode telah kadaluarsa');
+                    resetButton();
+                    break;
+
+                case 'failed':
+                    setStatusUI('error', 'times-circle', 'Gagal', 'Bot gagal menghasilkan kode');
+                    resetButton();
+                    break;
+
+                case 'existing':
+                    setStatusUI('connected', 'check-double', 'Bot Sudah Ada', 'Bot sudah terhubung sebelumnya');
+                    showElement(document.getElementById('connectedAction'));
+                    resetButton();
+                    break;
+
+                case 'logged_out':
+                    setStatusUI('error', 'sign-out-alt', 'Logged Out', 'Bot telah logout');
+                    resetButton();
+                    break;
+
+                case 'stopped':
+                    setStatusUI('error', 'stop-circle', 'Dihentikan', 'Bot sedang tidak aktif');
+                    resetButton();
+                    break;
+
+                default:
+                    if (data.code) {
+                        clearInterval(checkInterval);
+                        setStatusUI('success', 'gem', 'Kode Pairing', 'Masukkan kode di WhatsApp:');
+                        document.getElementById('codeValue').innerText = data.code;
+                        showElement(document.getElementById('codeDisplay'));
+                        showElement(document.getElementById('whatsappAction'));
+                        startCountdown(expiry);
+                    } else {
+                        setStatusUI('waiting', 'clock', 'Menunggu', `Status: ${data.status}`);
                     }
-                    
-                    if (pollInterval) {
-                        clearInterval(pollInterval);
-                        pollInterval = null;
-                        isPolling = false;
-                        updateDebugPolling();
-                    }
-                    
-                    enableButton();
-                    return;
-                }
-                
-                switch(status) {
-                    case 'processing':
-                        setStatus('waiting', 'fa-spinner fa-pulse', 'Memproses', 'Bot sedang menyiapkan kode...');
-                        break;
-                    case 'pending':
-                        setStatus('waiting', 'fa-clock', 'Menunggu', 'Bot akan segera merespon...');
-                        break;
-                    case 'sent':
-                        setStatus('waiting', 'fa-paper-plane', 'Kode Terkirim', 'Cek WhatsApp Anda');
-                        break;
-                    case 'expired':
-                        setStatus('expired', 'fa-hourglass-end', 'Expired', 'Kode telah kadaluarsa');
-                        stopAllIntervals();
-                        enableButton();
-                        break;
-                    case 'failed':
-                        setStatus('error', 'fa-times-circle', 'Gagal', 'Bot gagal menghasilkan kode');
-                        stopAllIntervals();
-                        enableButton();
-                        break;
-                    case 'logged_out':
-                        setStatus('error', 'fa-sign-out-alt', 'Logged Out', 'Bot telah logout');
-                        stopAllIntervals();
-                        enableButton();
-                        break;
-                    case 'stopped':
-                        setStatus('error', 'fa-stop-circle', 'Dihentikan', 'Bot tidak aktif');
-                        stopAllIntervals();
-                        enableButton();
-                        break;
-                    default:
-                        setStatus('waiting', 'fa-clock', 'Menunggu', `Status: ${status}`);
-                }
-            } catch (error) {
-                console.error('Check status error:', error);
             }
+        } catch (error) {
+            console.error('Status check error:', error);
         }
+    }
 
-        elements.phone.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') requestPairing();
-        });
+    document.getElementById('phone').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') requestPairing();
+    });
 
-        elements.requestBtn.addEventListener('click', requestPairing);
-
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('lastPhone');
-            if (saved) elements.phone.value = saved;
-            updateDebugPolling();
-        });
-    </script>
+    window.addEventListener('load', () => {
+        const saved = localStorage.getItem('lastPhone');
+        if (saved) document.getElementById('phone').value = saved;
+    });
+</script>
 </body>
 </html>
