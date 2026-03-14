@@ -35,6 +35,7 @@ const pairingSchema = new mongoose.Schema({
     type: Date, 
     default: Date.now 
   },
+  connectedAt: { type: Date },
   expiresAt: { 
     type: Date, 
     default: () => new Date(+new Date() + 5 * 60 * 1000) 
