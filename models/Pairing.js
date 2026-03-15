@@ -37,10 +37,10 @@ const pairingSchema = new mongoose.Schema({
   },
   connectedAt: { type: Date },
   welcomed: { type: Boolean, default: false },
-  expiresAt: { 
-    type: Date, 
-    default: () => new Date(+new Date() + 5 * 60 * 1000) 
-  }
+expiresAt: { 
+  type: Date, 
+  default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
+}
 });
 
 module.exports = mongoose.model('Pairing', pairingSchema);
