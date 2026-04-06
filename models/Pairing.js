@@ -23,7 +23,8 @@ const pairingSchema = new mongoose.Schema({
       'failed',        // 6. Gagal
       'existing',      // 7. Bot sudah ada
       'logged_out',    // 8. Bot logout
-      'stopped'        // 9. Bot dihentikan
+      'stopped',       // 9. Bot dihentikan
+      'invalid'        // 10. nomor tidak aktif di WhatsApp.
     ], 
     default: 'pending' 
   },
