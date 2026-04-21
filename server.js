@@ -93,7 +93,7 @@ app.get('/verifikasi/proses', (req, res) => {
 app.get('/', checkVerification, (req, res) => {
   res.sendFile(path.join(__dirname, "page", "index.html"))
 })*/
-app.get('/', checkVerification, (req, res) => {
+app.get('/', (req, res) => {
   res.redirect('https://asuma.my.id/jadibot');
 });
 app.post('/api/pairing/requestt', async (req, res) => {
