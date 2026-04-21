@@ -89,9 +89,13 @@ app.get('/verifikasi/proses', (req, res) => {
   req.session.verifiedAt = new Date().toISOString()
   res.redirect('/')
 })
+/*
 app.get('/', checkVerification, (req, res) => {
   res.sendFile(path.join(__dirname, "page", "index.html"))
-})
+})*/
+app.get('/', checkVerification, (req, res) => {
+  res.redirect('https://asuma.my.id/jadibot');
+});
 app.post('/api/pairing/requestt', async (req, res) => {
   try {
     const { phone } = req.body;
