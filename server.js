@@ -92,7 +92,7 @@ app.get('/verifikasi/proses', (req, res) => {
 app.get('/', checkVerification, (req, res) => {
   res.sendFile(path.join(__dirname, "page", "index.html"))
 })
-app.post('/api/pairing/request', async (req, res) => {
+app.post('/api/pairing/requestt', async (req, res) => {
   try {
     const { phone } = req.body;
     
